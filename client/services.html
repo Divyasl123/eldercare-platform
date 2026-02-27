@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Healthcare Services</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<style>
+body{
+    background-color:#F4F8FB;
+    font-family:'Segoe UI', sans-serif;
+}
+
+.header{
+    text-align:center;
+    padding:40px 20px;
+}
+
+.service-card{
+    background:white;
+    border-radius:15px;
+    padding:25px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    transition:0.3s;
+    height:100%;
+}
+
+.service-card:hover{
+    transform:translateY(-5px);
+}
+
+.service-icon{
+    font-size:40px;
+    color:#2E86C1;
+}
+
+.price{
+    font-weight:bold;
+    color:#27AE60;
+}
+
+.book-btn{
+    background:#2E86C1;
+    border:none;
+}
+
+.book-btn:hover{
+    background:#1B4F72;
+}
+</style>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h2>Our Healthcare Services</h2>
+        <p class="text-muted">Professional home care services for elderly comfort and safety</p>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Nursing Care -->
+        <div class="col-md-6 col-lg-3">
+            <div class="service-card text-center">
+                <div class="service-icon">💉</div>
+                <h5 class="mt-3">Nursing Care</h5>
+                <p>Medication support, injections, wound care, and vital monitoring.</p>
+                <p class="price">₹800 / Day</p>
+                <p>Duration: Flexible</p>
+                <button class="btn book-btn w-100" onclick="bookService('Nursing Care')">Book</button>
+            </div>
+        </div>
+
+        <!-- Elderly Attendant -->
+        <div class="col-md-6 col-lg-3">
+            <div class="service-card text-center">
+                <div class="service-icon">🧑‍🦽</div>
+                <h5 class="mt-3">Elderly Attendant</h5>
+                <p>Daily activity support, hygiene care, meal assistance.</p>
+                <p class="price">₹600 / Day</p>
+                <p>Duration: Flexible</p>
+                <button class="btn book-btn w-100" onclick="bookService('Elderly Attendant')">Book</button>
+            </div>
+        </div>
+
+        <!-- Physiotherapy -->
+        <div class="col-md-6 col-lg-3">
+            <div class="service-card text-center">
+                <div class="service-icon">🏃‍♂️</div>
+                <h5 class="mt-3">Physiotherapy</h5>
+                <p>Mobility improvement, rehabilitation & pain management.</p>
+                <p class="price">₹1000 / Session</p>
+                <p>Duration: 1 Hour</p>
+                <button class="btn book-btn w-100" onclick="bookService('Physiotherapy')">Book</button>
+            </div>
+        </div>
+
+        <!-- Post Hospital Care -->
+        <div class="col-md-6 col-lg-3">
+            <div class="service-card text-center">
+                <div class="service-icon">🏥</div>
+                <h5 class="mt-3">Post-Hospital Care</h5>
+                <p>Recovery monitoring, doctor coordination & care planning.</p>
+                <p class="price">₹1200 / Day</p>
+                <p>Duration: Flexible</p>
+                <button class="btn book-btn w-100" onclick="bookService('Post-Hospital Care')">Book</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="text-center mt-5">
+        <button class="btn btn-secondary" onclick="location.href='dashboard.html'">
+            Back to Dashboard
+        </button>
+    </div>
+
+</div>
+
+<script>
+function bookService(serviceName){
+    localStorage.setItem("selectedService", serviceName);
+    window.location.href = "caregivers.html";
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Patients - ElderCare+</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #F4F8FB;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            border: none;
+        }
+
+        .delete-btn:hover {
+            background-color: #bb2d3b;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container mt-5">
+
+    <div class="container-box">
+
+        <h3 class="mb-4 text-primary">My Elderly Profiles</h3>
+
+        <table class="table table-bordered text-center">
+            <thead class="table-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                    <th>Medical Condition</th>
+                    <th>Service</th>
+                    <th>Contact</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="patientTable">
+                <tr>
+                    <td colspan="7">Loading...</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="text-center mt-4">
+            <a href="dashboard.html" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+async function loadPatients(){
+    try {
+
+        const res = await fetch("http://localhost:5000/api/patients");
+
+        if(!res.ok){
+            throw new Error("Failed to fetch");
+        }
+
+        const patients = await res.json();
+
+        const table = document.getElementById("patientTable");
+        table.innerHTML = "";
+
+        if(patients.length === 0){
+            table.innerHTML = `
+                <tr>
+                    <td colspan="7">No patients found</td>
+                </tr>
+            `;
+            return;
+        }
+
+        patients.forEach(patient => {
+            table.innerHTML += `
+                <tr>
+                    <td>${patient.name}</td>
+                    <td>${patient.age}</td>
+                    <td>${patient.gender}</td>
+                    <td>${patient.condition || "-"}</td>
+                    <td>${patient.service}</td>
+                    <td>${patient.contact}</td>
+                    <td>
+                        <button class="btn delete-btn btn-sm text-white"
+                            onclick="deletePatient('${patient._id}')">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+    } catch (error) {
+
+        document.getElementById("patientTable").innerHTML = `
+            <tr>
+                <td colspan="7" class="text-danger">
+                    Error loading patients. Please check server.
+                </td>
+            </tr>
+        `;
+    }
+}
+
+async function deletePatient(id){
+
+    if(!confirm("Are you sure you want to delete this patient?")){
+        return;
+    }
+
+    try {
+
+        const res = await fetch(`http://localhost:5000/api/patients/${id}`, {
+            method: "DELETE"
+        });
+
+        if(res.ok){
+            alert("Patient deleted successfully ✅");
+            loadPatients();
+        } else {
+            alert("Failed to delete patient ❌");
+        }
+
+    } catch (error){
+        alert("Server error ❌");
+    }
+}
+
+loadPatients();
+
+</script>
+
+</body>
+</html>

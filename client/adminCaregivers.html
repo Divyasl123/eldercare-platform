@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin - Manage Caregivers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body{
+            background:#F4F8FB;
+            font-family:'Segoe UI', sans-serif;
+        }
+
+        .sidebar{
+            height:100vh;
+            background:#2E86C1;
+            color:white;
+            padding:30px 15px;
+        }
+
+        .sidebar a{
+            color:white;
+            display:block;
+            padding:10px;
+            text-decoration:none;
+            border-radius:8px;
+        }
+
+        .sidebar a:hover{
+            background:#3498DB;
+        }
+
+        .card{
+            border-radius:15px;
+            box-shadow:0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .caregiver-img{
+            width:100%;
+            height:180px;
+            object-fit:cover;
+            border-radius:10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container-fluid">
+<div class="row">
+
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2 sidebar">
+        <h4>Admin Panel</h4>
+        <a href="admin.html">Dashboard</a>
+        <a href="adminCaregivers.html">Manage Caregivers</a>
+        <a href="adminBookings.html">Manage Bookings</a>
+        <a href="dashboard.html">User Panel</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9 col-lg-10 p-4">
+
+        <h3 class="mb-4">Manage Caregivers</h3>
+
+        <!-- Add Caregiver -->
+        <div class="card p-4 mb-4">
+            <h5 class="mb-3">Add New Caregiver</h5>
+
+            <input type="text" id="name" class="form-control mb-2" placeholder="Full Name">
+            <input type="text" id="qualification" class="form-control mb-2" placeholder="Qualification">
+            <input type="number" id="experience" class="form-control mb-2" placeholder="Experience (Years)">
+            <input type="text" id="photo" class="form-control mb-3" placeholder="Photo URL">
+
+            <button class="btn btn-primary w-100" onclick="addCaregiver()">Add Caregiver</button>
+        </div>
+
+        <!-- Caregiver List -->
+        <div id="caregiverList" class="row g-4"></div>
+
+    </div>
+</div>
+</div>
+
+<script>
+
+async function loadCaregivers(){
+
+    const res = await fetch("http://localhost:5000/api/caregivers");
+    const data = await res.json();
+
+    const container = document.getElementById("caregiverList");
+    container.innerHTML="";
+
+    if(data.length === 0){
+        container.innerHTML = "<p>No caregivers available.</p>";
+        return;
+    }
+
+    data.forEach(cg=>{
+        container.innerHTML += `
+            <div class="col-md-4">
+                <div class="card p-3">
+                    <img src="${cg.photo || 'https://via.placeholder.com/300x180'}" class="caregiver-img mb-3">
+                    <h5>${cg.name}</h5>
+                    <p><strong>Qualification:</strong> ${cg.qualification}</p>
+                    <p><strong>Experience:</strong> ${cg.experience} Years</p>
+                    <button class="btn btn-danger w-100"
+                        onclick="deleteCaregiver('${cg._id}')">
+                        Remove
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+}
+
+async function addCaregiver(){
+
+    const name = document.getElementById("name").value.trim();
+    const qualification = document.getElementById("qualification").value.trim();
+    const experience = document.getElementById("experience").value.trim();
+    const photo = document.getElementById("photo").value.trim();
+
+    if(!name || !qualification || !experience){
+        alert("Please fill all required fields");
+        return;
+    }
+
+    await fetch("http://localhost:5000/api/caregivers",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({name, qualification, experience, photo})
+    });
+
+    alert("Caregiver Added Successfully ✅");
+
+    // Clear form
+    document.getElementById("name").value="";
+    document.getElementById("qualification").value="";
+    document.getElementById("experience").value="";
+    document.getElementById("photo").value="";
+
+    loadCaregivers();
+}
+
+async function deleteCaregiver(id){
+
+    if(confirm("Are you sure you want to remove this caregiver?")){
+        await fetch("http://localhost:5000/api/caregivers/"+id,{
+            method:"DELETE"
+        });
+
+        alert("Caregiver Removed ❌");
+        loadCaregivers();
+    }
+}
+
+loadCaregivers();
+
+</script>
+
+</body>
+</html>

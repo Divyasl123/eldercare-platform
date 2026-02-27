@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin - View Patients</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body{
+            margin:0;
+            font-family:'Segoe UI', sans-serif;
+            background:#F4F8FB;
+        }
+
+        .sidebar{
+            height:100vh;
+            background:#2E86C1;
+            color:white;
+            padding-top:30px;
+        }
+
+        .sidebar a{
+            display:block;
+            padding:12px 20px;
+            color:white;
+            text-decoration:none;
+        }
+
+        .sidebar a:hover{
+            background:#3498DB;
+        }
+
+        .main-content{
+            padding:40px;
+        }
+
+        .card{
+            border:none;
+            border-radius:15px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.08);
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container-fluid">
+<div class="row">
+
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2 sidebar">
+        <h4 class="text-center">Admin Panel</h4>
+        <a href="admin.html">Dashboard</a>
+        <a href="adminPatients.html">View Patients</a>
+        <a href="adminCaregivers.html">Manage Caregivers</a>
+        <a href="adminBookings.html">Manage Bookings</a>
+        <a href="dashboard.html">User Panel</a>
+        <a href="login.html">Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9 col-lg-10 main-content">
+
+        <h2 class="mb-4">All Registered Patients</h2>
+
+        <div class="row" id="patientContainer"></div>
+
+    </div>
+</div>
+</div>
+
+<script>
+
+async function loadPatients(){
+
+    try{
+        const res = await fetch("http://localhost:5000/api/patients");
+        const patients = await res.json();
+
+        const container = document.getElementById("patientContainer");
+        container.innerHTML = "";
+
+        if(patients.length === 0){
+            container.innerHTML = "<p>No patients found.</p>";
+            return;
+        }
+
+        patients.forEach(p => {
+
+            container.innerHTML += `
+                <div class="col-md-4 mb-4">
+                    <div class="card p-3">
+                        <h5>${p.name}</h5>
+                        <p><strong>Age:</strong> ${p.age}</p>
+                        <p><strong>Gender:</strong> ${p.gender}</p>
+                        <p><strong>Condition:</strong> ${p.condition}</p>
+                        <p><strong>Service:</strong> ${p.service}</p>
+                        <p><strong>Contact:</strong> ${p.contact}</p>
+                    </div>
+                </div>
+            `;
+        });
+
+    }catch(error){
+        console.log("Error loading patients:", error);
+    }
+}
+
+loadPatients();
+
+</script>
+
+</body>
+</html>
