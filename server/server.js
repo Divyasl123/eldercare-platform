@@ -42,7 +42,7 @@ mongoose.connect(MONGO_URI)
 ============================== */
 
 const userRoutes = require("./routes/userRoutes");
-const patientRoutes = require("./routes/patientRoutes");
+const patientRoutes = require("./routes/PatientRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const caregiverRoutes = require("./routes/caregiverRoutes");
 const serviceRoutes = require("./routes/serviceRoutes");
