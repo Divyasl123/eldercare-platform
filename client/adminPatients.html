@@ -2,111 +2,152 @@
 <html>
 <head>
     <title>Admin - View Patients</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <meta charset="UTF-8">
     <style>
-        body{
-            margin:0;
-            font-family:'Segoe UI', sans-serif;
-            background:#F4F8FB;
+        body {
+            font-family: Arial;
+            margin: 0;
+            background: #f4f7fb;
         }
 
-        .sidebar{
-            height:100vh;
-            background:#2E86C1;
-            color:white;
-            padding-top:30px;
+        .sidebar {
+            width: 220px;
+            height: 100vh;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            padding: 20px;
         }
 
-        .sidebar a{
-            display:block;
-            padding:12px 20px;
-            color:white;
-            text-decoration:none;
+        .sidebar h2 {
+            margin-top: 0;
         }
 
-        .sidebar a:hover{
-            background:#3498DB;
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            margin: 15px 0;
         }
 
-        .main-content{
-            padding:40px;
+        .content {
+            margin-left: 240px;
+            padding: 30px;
         }
 
-        .card{
-            border:none;
-            border-radius:15px;
-            box-shadow:0 4px 15px rgba(0,0,0,0.08);
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background: #3498db;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            padding: 6px 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
         }
     </style>
 </head>
-
 <body>
 
-<div class="container-fluid">
-<div class="row">
-
-    <!-- Sidebar -->
-    <div class="col-md-3 col-lg-2 sidebar">
-        <h4 class="text-center">Admin Panel</h4>
-        <a href="admin.html">Dashboard</a>
-        <a href="adminPatients.html">View Patients</a>
-        <a href="adminCaregivers.html">Manage Caregivers</a>
-        <a href="adminBookings.html">Manage Bookings</a>
-        <a href="dashboard.html">User Panel</a>
-        <a href="login.html">Logout</a>
-    </div>
-
-    <!-- Main Content -->
-    <div class="col-md-9 col-lg-10 main-content">
-
-        <h2 class="mb-4">All Registered Patients</h2>
-
-        <div class="row" id="patientContainer"></div>
-
-    </div>
+<div class="sidebar">
+    <h2>Admin Panel</h2>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="adminPatients.html">View Patients</a>
+    <a href="adminBookings.html">Manage Bookings</a>
 </div>
+
+<div class="content">
+    <h2>All Registered Patients</h2>
+
+    <p id="errorMsg" class="error"></p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>Condition</th>
+                <th>Service</th>
+                <th>Contact</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="patientTable"></tbody>
+    </table>
 </div>
 
 <script>
 
-async function loadPatients(){
+const API_BASE = "http://127.0.0.1:5000";
 
-    try{
-        const res = await fetch("http://localhost:5000/api/patients");
-        const patients = await res.json();
+async function loadPatients() {
+    const table = document.getElementById("patientTable");
+    const errorMsg = document.getElementById("errorMsg");
 
-        const container = document.getElementById("patientContainer");
-        container.innerHTML = "";
+    try {
+        const res = await fetch(`${API_BASE}/api/patients`);
+        const result = await res.json();
 
-        if(patients.length === 0){
-            container.innerHTML = "<p>No patients found.</p>";
-            return;
+        if (!result.success) {
+            throw new Error("Failed to load");
         }
 
-        patients.forEach(p => {
+        table.innerHTML = "";
+        errorMsg.innerText = "";
 
-            container.innerHTML += `
-                <div class="col-md-4 mb-4">
-                    <div class="card p-3">
-                        <h5>${p.name}</h5>
-                        <p><strong>Age:</strong> ${p.age}</p>
-                        <p><strong>Gender:</strong> ${p.gender}</p>
-                        <p><strong>Condition:</strong> ${p.condition}</p>
-                        <p><strong>Service:</strong> ${p.service}</p>
-                        <p><strong>Contact:</strong> ${p.contact}</p>
-                    </div>
-                </div>
+        result.data.forEach(patient => {
+            table.innerHTML += `
+                <tr>
+                    <td>${patient.name}</td>
+                    <td>${patient.age}</td>
+                    <td>${patient.gender}</td>
+                    <td>${patient.condition}</td>
+                    <td>${patient.service}</td>
+                    <td>${patient.contact}</td>
+                    <td>
+                        <button class="delete-btn"
+                            onclick="deletePatient('${patient._id}')">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
             `;
         });
 
-    }catch(error){
-        console.log("Error loading patients:", error);
+    } catch (err) {
+        errorMsg.innerText = "Unable to load patients.";
+        console.error(err);
     }
 }
 
-loadPatients();
+async function deletePatient(id) {
+    await fetch(`${API_BASE}/api/patients/${id}`, {
+        method: "DELETE"
+    });
+    loadPatients();
+}
+
+window.onload = loadPatients;
 
 </script>
 

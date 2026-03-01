@@ -44,7 +44,6 @@ const patientSchema = new mongoose.Schema(
   }
 );
 
-
 // Prevent model overwrite error in development
 module.exports =
   mongoose.models.Patient || mongoose.model("Patient", patientSchema);
