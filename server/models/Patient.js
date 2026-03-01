@@ -26,4 +26,4 @@ const patientSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-module.exports = mongoose.model("Patient", patientSchema);
+module.exports = mongoose.models.Patient || mongoose.model("Patient", patientSchema);
