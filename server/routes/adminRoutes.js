@@ -2,14 +2,15 @@ const express = require("express");
 const router = express.Router();
 
 // ✅ IMPORTANT: Match exact file names (case sensitive)
-const User = require("../models/user");         // small u
-const Patient = require("../models/patient");  // capital P (because file is Patient.js)
-const Booking = require("../models/booking");  // small b
-const Caregiver = require("../models/caregiver"); // small c
+const User = require("../models/user");
+const Patient = require("../models/patient");
+const Booking = require("../models/booking");
+const Caregiver = require("../models/caregiver");
 
-// =============================
-// ADMIN STATS ROUTE
-// =============================
+
+// =====================================
+// ✅ ADMIN STATS ROUTE
+// =====================================
 router.get("/stats", async (req, res) => {
   try {
     const users = await User.countDocuments();
@@ -25,9 +26,13 @@ router.get("/stats", async (req, res) => {
     });
 
   } catch (error) {
-    console.error(error);
+    console.error("Admin Stats Error:", error);
     res.status(500).json({ message: "Server Error" });
   }
 });
 
+
+// =====================================
+// ✅ EXPORT ROUTER
+// =====================================
 module.exports = router;

@@ -1,64 +1,150 @@
 const express = require("express");
 const router = express.Router();
-const Patient = require("../models/Patient");
+const mongoose = require("mongoose");
+const Patient = require("../models/patient");
 
-/* ================= CREATE PATIENT ================= */
 
+// ======================================
+// ✅ CREATE PATIENT
+// ======================================
 router.post("/", async (req, res) => {
+  try {
+    console.log("Incoming Data:", req.body);
 
-    try {
+    const { name, age, gender, condition, service, contact } = req.body;
 
-        console.log("Incoming Data:", req.body);
-
-        const { name, age, gender, condition, service, contact } = req.body;
-
-        if (!name || !age || !gender || !service || !contact) {
-            return res.status(400).json({ message: "All required fields must be filled" });
-        }
-
-        const newPatient = new Patient({
-            name,
-            age,
-            gender,
-            condition,
-            service,
-            contact
-        });
-
-        await newPatient.save();
-
-        res.status(201).json({
-            message: "Patient created successfully",
-            patient: newPatient
-        });
-
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Server Error" });
+    // Basic validation
+    if (!name || !age || !gender || !service || !contact) {
+      return res.status(400).json({
+        success: false,
+        message: "All required fields must be filled",
+      });
     }
 
+    const newPatient = new Patient({
+      name,
+      age,
+      gender,
+      condition,
+      service,
+      contact,
+    });
+
+    await newPatient.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Patient created successfully",
+      data: newPatient,
+    });
+
+  } catch (error) {
+    console.error("Create Patient Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
 });
 
-// ===============================
-// GET ALL PATIENTS
-// ===============================
+
+// ======================================
+// ✅ GET ALL PATIENTS
+// ======================================
 router.get("/", async (req, res) => {
-    try {
-        const patients = await Patient.find().sort({ createdAt: -1 });
-        res.json(patients);
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching patients" });
-    }
+  try {
+    const patients = await Patient.find().sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: patients.length,
+      data: patients,
+    });
+
+  } catch (error) {
+    console.error("Fetch Patients Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching patients",
+    });
+  }
 });
 
-// DELETE PATIENT
-router.delete("/:id", async (req, res) => {
-    try {
-        await Patient.findByIdAndDelete(req.params.id);
-        res.json({ message: "Patient deleted successfully" });
-    } catch (error) {
-        res.status(500).json({ message: "Error deleting patient" });
+
+// ======================================
+// ✅ GET SINGLE PATIENT BY ID
+// ======================================
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Patient ID",
+      });
     }
+
+    const patient = await Patient.findById(id);
+
+    if (!patient) {
+      return res.status(404).json({
+        success: false,
+        message: "Patient not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: patient,
+    });
+
+  } catch (error) {
+    console.error("Get Patient Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
 });
+
+
+// ======================================
+// ✅ DELETE PATIENT
+// ======================================
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Patient ID",
+      });
+    }
+
+    const deletedPatient = await Patient.findByIdAndDelete(id);
+
+    if (!deletedPatient) {
+      return res.status(404).json({
+        success: false,
+        message: "Patient not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Patient deleted successfully",
+    });
+
+  } catch (error) {
+    console.error("Delete Patient Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error deleting patient",
+    });
+  }
+});
+
 
 module.exports = router;
